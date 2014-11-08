@@ -136,10 +136,10 @@
     <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>20</y>
-       <width>250</width>
-       <height>27</height>
+       <x>19</x>
+       <y>40</y>
+       <width>241</width>
+       <height>41</height>
       </rect>
      </property>
      <layout class="QHBoxLayout" name="hide1">
@@ -158,32 +158,19 @@
         </property>
        </widget>
       </item>
-      <item>
-       <spacer name="horizontalSpacer_4">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
      </layout>
     </widget>
     <widget class="QLabel" name="hide2">
      <property name="geometry">
       <rect>
-       <x>10</x>
+       <x>40</x>
        <y>70</y>
-       <width>681</width>
+       <width>651</width>
        <height>81</height>
       </rect>
      </property>
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;justify&quot;&gt;Connect with our community by checking out our &lt;a href=&quot;https://bitcointalk.org/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Bitcointalk thread,&lt;/span&gt;&lt;/a&gt;. We are also present on facebook, twitter, reddit and IRC.&lt;/p&gt;&lt;p align=&quot;justify&quot;&gt;You may connect to the IRC channel directly from your wallet by inputing a username beneath.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;justify&quot;&gt;Connect with our community by checking out our &lt;a href=&quot;https://bitcointalk.org/index.php?topic=848304&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Bitcointalk thread,&lt;/span&gt;&lt;/a&gt;. We are also present on facebook, twitter, reddit and IRC.&lt;/p&gt;&lt;p align=&quot;justify&quot;&gt;You may connect to the IRC channel directly from your wallet by inputing a username beneath.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="wordWrap">
       <bool>true</bool>
