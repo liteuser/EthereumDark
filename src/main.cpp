@@ -39,16 +39,16 @@ libzerocoin::Params* ZCParams;
 CBigNum bnProofOfWorkLimit(~uint256(0) >> 20); // "standard" scrypt target limit for proof of work, results with 0,000244140625 proof-of-work difficulty
 CBigNum bnProofOfStakeLimit(~uint256(0) >> 20);
 CBigNum bnProofOfStakeLimitAfterFork(~uint256(0) >> 12); // allow 256 times lower stake limit after fork
-const int forkNum = 8209;
+const int forkNum = 13999;
 const int DAILY_BLOCKCOUNT =  1440;
-const int decStakeForkNum = DAILY_BLOCKCOUNT*30; // first period of halving starts from 30 days from the beginning, @43200, still 100% after this
-const int decStakePeriod = DAILY_BLOCKCOUNT*30;  // stake is halved every 30 days, first halving at decStakeForkNum + decStakePeriod
+const int decStakeForkNum = DAILY_BLOCKCOUNT*60; // first period of halving starts from 60 days from the beginning, @86400, still 100% after this
+const int decStakePeriod = DAILY_BLOCKCOUNT*60;  // stake is halved every 60 days, first halving at decStakeForkNum + decStakePeriod
 
 CBigNum bnProofOfWorkLimitTestNet(~uint256(0) >> 16);
 
 unsigned int nTargetSpacing = 1 * 60; // 60 seconds
-unsigned int nStakeMinAge = 1 * 60 * 60; // 6 hours
-unsigned int nStakeMaxAge = 0;           // 0 days
+unsigned int nStakeMinAge = 8 * 60 * 60; // 8 hours
+unsigned int nStakeMaxAge = 60 * 60 * 24 * 20;  // 20 days
 unsigned int nModifierInterval = 10 * 60; // time to elapse before new modifier is computed
 
 int nCoinbaseMaturity = 100;
@@ -1017,6 +1017,8 @@ int64_t GetProofOfWorkReward(int64_t nFees)
 int64_t GetProofOfStakeReward(int64_t nCoinAge, int64_t nFees, int blockheight)
 {
     int64_t nRewardCoinYear;
+    int64_t nSubsidyLimit = 250 * COIN;
+
     if (blockheight <= forkNum) {
         nRewardCoinYear = MAX_MINT_PROOF_OF_STAKE;
     } else {
@@ -1027,11 +1029,18 @@ int64_t GetProofOfStakeReward(int64_t nCoinAge, int64_t nFees, int blockheight)
 	if (nRewardCoinYear < MAX_MINT_PROOF_OF_STAKE) nRewardCoinYear = MAX_MINT_PROOF_OF_STAKE;
     }
 
-    int64_t nSubsidy = nCoinAge * nRewardCoinYear / 365 / COIN;
+    nRewardCoinYear = MAX_MINT_PROOF_OF_STAKE_FORKED;
 
+    CBigNum bnSubsidy = (CBigNum(nCoinAge) * nRewardCoinYear) / 365 / COIN;
+
+    int64_t nSubsidy = bnSubsidy.getuint64();
+
+    // nSubsidy = nCoinAge / 365;
 
     if (fDebug && GetBoolArg("-printcreation"))
         printf("GetProofOfStakeReward(): create=%s nCoinAge=%"PRId64"\n", FormatMoney(nSubsidy).c_str(), nCoinAge);
+
+    nSubsidy = min(nSubsidy, nSubsidyLimit);
 
     return nSubsidy + nFees;
 }
@@ -2159,8 +2168,8 @@ bool CBlock::AcceptBlock()
     if (IsProofOfWork() && nHeight > LAST_POW_BLOCK)
         return DoS(100, error("AcceptBlock() : reject proof-of-work at height %d", nHeight));
 
-    if (IsProofOfStake() && nHeight < MODIFIER_INTERVAL_SWITCH)
-        return DoS(100, error("AcceptBlock() : reject proof-of-stake at height %d", nHeight));
+    if (IsProofOfStake() && (nHeight < MODIFIER_INTERVAL_SWITCH || GetBlockTime() < POS_SWITCH_TIME))
+        return DoS(100, error("AcceptBlock() : reject proof-of-stake at height %d and time %d", nHeight, (int)GetBlockTime()));
 
     // Check proof-of-work or proof-of-stake
     if (nBits != GetNextTargetRequired(pindexPrev, IsProofOfStake()))

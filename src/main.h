@@ -39,9 +39,12 @@ static const int64_t MIN_TX_FEE = 0;
 static const int64_t MIN_RELAY_TX_FEE = MIN_TX_FEE;
 static const int64_t MAX_MONEY = 5000000 * COIN;
 static const int64_t COIN_YEAR_REWARD = 100 * CENT; // 100% per year
-static const int64_t MAX_MINT_PROOF_OF_STAKE = 10000 * COIN;	// 1% annual interest
-static const int64_t MAX_MINT_PROOF_OF_STAKE_FORKED = 10000 * COIN;	// 100% annual interest
+static const int64_t MAX_MINT_PROOF_OF_STAKE = 0.1 * COIN;	// 10% annual interest
+static const int64_t MAX_MINT_PROOF_OF_STAKE_FORKED = 1 * COIN;	// 100% annual interest
 static const int MODIFIER_INTERVAL_SWITCH = 7200;
+
+/** Hard Fork Change Times/Block */
+static const unsigned int POS_SWITCH_TIME = 1417784400; // Dec 5 13:00:00 2014 UTC
 
 inline bool MoneyRange(int64_t nValue) { return (nValue >= 0 && nValue <= MAX_MONEY); }
 // Threshold for nLockTime: below this value it is interpreted as block number, otherwise as UNIX timestamp.
