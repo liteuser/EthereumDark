@@ -678,10 +678,10 @@ int CWalletTx::GetRequestCount() const
     return nRequests;
 }
 
-void CWalletTx::GetAmounts(list<pair<CTxDestination, int64_t> >& listReceived,
+void CWalletTx::GetAmounts(int64_t& nGeneratedImmature, int64_t& nGeneratedMature, list<pair<CTxDestination, int64_t> >& listReceived,
                            list<pair<CTxDestination, int64_t> >& listSent, int64_t& nFee, string& strSentAccount) const
 {
-    nFee = 0;
+    nGeneratedImmature = nGeneratedMature = nFee = 0;
     listReceived.clear();
     listSent.clear();
     strSentAccount = strFromAccount;
@@ -730,7 +730,17 @@ void CWalletTx::GetAmounts(list<pair<CTxDestination, int64_t> >& listReceived,
 
         // If we are receiving the output, add it as a "received" entry
         if (fIsMine)
-            listReceived.push_back(make_pair(address, txout.nValue));
+        {
+            if(IsCoinBaseOrStake())
+            {
+                if(GetBlocksToMaturity() > 0)
+                    nGeneratedImmature += txout.nValue;
+                else
+                    nGeneratedMature += txout.nValue;
+            }
+            else
+                listReceived.push_back(make_pair(address, txout.nValue));
+        }
     }
 
 }
@@ -740,11 +750,11 @@ void CWalletTx::GetAccountAmounts(const string& strAccount, int64_t& nReceived,
 {
     nReceived = nSent = nFee = 0;
 
-    int64_t allFee;
+    int64_t allGeneratedImmature, allGeneratedMature, allFee;
     string strSentAccount;
     list<pair<CTxDestination, int64_t> > listReceived;
     list<pair<CTxDestination, int64_t> > listSent;
-    GetAmounts(listReceived, listSent, allFee, strSentAccount);
+    GetAmounts(allGeneratedImmature, allGeneratedMature, listReceived, listSent, allFee, strSentAccount);
 
     if (strAccount == strSentAccount)
     {

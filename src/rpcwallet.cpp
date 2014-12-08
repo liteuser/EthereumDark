@@ -578,11 +578,13 @@ Value getbalance(const Array& params, bool fHelp)
             if (!wtx.IsTrusted())
                 continue;
 
-            int64_t allFee;
+            int64_t allGeneratedImmature, allGeneratedMature, allFee;
+            allGeneratedImmature = allGeneratedMature = allFee = 0;
+
             string strSentAccount;
             list<pair<CTxDestination, int64_t> > listReceived;
             list<pair<CTxDestination, int64_t> > listSent;
-            wtx.GetAmounts(listReceived, listSent, allFee, strSentAccount);
+            wtx.GetAmounts(allGeneratedImmature, allGeneratedMature, listReceived, listSent, allFee, strSentAccount);
             if (wtx.GetDepthInMainChain() >= nMinDepth && wtx.GetBlocksToMaturity() == 0)
             {
                 BOOST_FOREACH(const PAIRTYPE(CTxDestination,int64_t)& r, listReceived)
@@ -1000,12 +1002,12 @@ static void MaybePushAddress(Object & entry, const CTxDestination &dest)
 
 void ListTransactions(const CWalletTx& wtx, const string& strAccount, int nMinDepth, bool fLong, Array& ret)
 {
-    int64_t nFee;
+    int64_t nGeneratedImmature, nGeneratedMature, nFee;
     string strSentAccount;
     list<pair<CTxDestination, int64_t> > listReceived;
     list<pair<CTxDestination, int64_t> > listSent;
 
-    wtx.GetAmounts(listReceived, listSent, nFee, strSentAccount);
+    wtx.GetAmounts(nGeneratedImmature, nGeneratedMature, listReceived, listSent, nFee, strSentAccount);
 
     bool fAllAccounts = (strAccount == string("*"));
 
@@ -1167,14 +1169,14 @@ Value listaccounts(const Array& params, bool fHelp)
     for (map<uint256, CWalletTx>::iterator it = pwalletMain->mapWallet.begin(); it != pwalletMain->mapWallet.end(); ++it)
     {
         const CWalletTx& wtx = (*it).second;
-        int64_t nFee;
+        int64_t nGeneratedImmature, nGeneratedMature, nFee;
         string strSentAccount;
         list<pair<CTxDestination, int64_t> > listReceived;
         list<pair<CTxDestination, int64_t> > listSent;
         int nDepth = wtx.GetDepthInMainChain();
         if (nDepth < 0)
             continue;
-        wtx.GetAmounts(listReceived, listSent, nFee, strSentAccount);
+        wtx.GetAmounts(nGeneratedImmature, nGeneratedMature, listReceived, listSent, nFee, strSentAccount);
         mapAccountBalances[strSentAccount] -= nFee;
         BOOST_FOREACH(const PAIRTYPE(CTxDestination, int64_t)& s, listSent)
             mapAccountBalances[strSentAccount] -= s.second;
@@ -1261,6 +1263,64 @@ Value listsinceblock(const Array& params, bool fHelp)
     ret.push_back(Pair("lastblock", lastblock.GetHex()));
 
     return ret;
+}
+
+Value getstaketx(const Array& params, bool fHelp) 
+{ 
+    if (fHelp || params.size() != 1) 
+        throw runtime_error( 
+            "getstaketx <txid>\n" 
+            "Get detailed information about a specific stake <txid>"); 
+ 
+    uint256 hash; 
+    hash.SetHex(params[0].get_str()); 
+ 
+    Object entry; 
+	Array vin; 
+ 
+    if (pwalletMain->mapWallet.count(hash)) 
+    { 
+        const CWalletTx& wtx = pwalletMain->mapWallet[hash]; 
+		 
+		 BOOST_FOREACH(const CTxIn& txin, wtx.vin) 
+		{ 
+			Object in; 
+			if (wtx.IsCoinBase()) 
+				entry.push_back(Pair("coinbase", HexStr(txin.scriptSig.begin(), txin.scriptSig.end()))); 
+			else 
+			{ 
+                CTransaction& txPrev = pwalletMain->mapWallet[txin.prevout.hash]; //first transaction 
+                uint64_t nTime = wtx.nTime; //stake tx time 
+                uint64_t nPrevTime = txPrev.nTime; //previous tx time
+                uint64_t nTimeToStake = nTime - nPrevTime; // time to stake in seconds 
+                double dDaysToStake = nTimeToStake / 60.00 / 60 / 24; 
+				 
+                //entry.push_back(Pair("txid", txin.prevout.hash.GetHex())); previous txid - not necessary to display right now 
+                entry.push_back(Pair("Stake TX Time", nTime));
+                entry.push_back(Pair("Previous Time", nPrevTime));
+                entry.push_back(Pair("Days To Stake", dDaysToStake));
+ 
+                int64_t nDebit = wtx.GetDebit(); 
+                int64_t nFee = (wtx.IsFromMe() ? wtx.GetValueOut() - nDebit : 0);
+				 
+                int64_t nGeneratedImmature, nGeneratedMature, nFee2;
+                string strSentAccount;
+                list<pair<CTxDestination, int64_t> > listReceived;
+                list<pair<CTxDestination, int64_t> > listSent;
+                wtx.GetAmounts(nGeneratedImmature, nGeneratedMature, listReceived, listSent, nFee2, strSentAccount); 
+                uint64_t nGeneratedAmount = max (nGeneratedMature, nGeneratedImmature);
+                double nGeneratedAmount2 = max (nGeneratedMature, nGeneratedImmature); //uint64_t math not working
+                double percentReward = nFee / (nGeneratedAmount2 - nFee);
+				
+                entry.push_back(Pair("Original Amount", ValueFromAmount(nGeneratedAmount - nFee)));
+                entry.push_back(Pair("PoS Reward", ValueFromAmount(nFee)));
+                entry.push_back(Pair("Reward %", percentReward*100));
+                entry.push_back(Pair("Total New Amount", ValueFromAmount(nGeneratedAmount)));
+                entry.push_back(Pair("Size of Each New Block", ValueFromAmount(nGeneratedAmount/2)));
+			} 
+		} 
+    } 
+    return entry; 
 }
 
 Value gettransaction(const Array& params, bool fHelp)
