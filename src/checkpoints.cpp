@@ -27,6 +27,7 @@ namespace Checkpoints
         ( 0,      hashGenesisBlock )
         ( 1,  uint256("0x000009ffd286eac9aa4c0bfad28be83e3e5c65365484c7fb7425d5df60f4060a"))
         (13999, uint256("0x00000000135c5aa0fe51af8775073b8921ca31696393175af9903a8db08669e6"))
+        (16500, uint256("0x4db3a96f6dcd0fb147cb944bed52f8c65d14af6379614dbc9f744024d6b7f48c"))
     ;
 
     // TestNet has no checkpoints
