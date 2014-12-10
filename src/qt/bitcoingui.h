@@ -3,10 +3,10 @@
 
 #include <QMainWindow>
 #include <QSystemTrayIcon>
-#include "chatwindow.h"
+
 #include "init.h"
 #include "statisticspage.h"
-#include "chatwindow.h"
+
 class TransactionTableModel;
 class ClientModel;
 class WalletModel;
@@ -19,6 +19,8 @@ class Notificator;
 class RPCConsole;
 class StatisticsPage;
 class BlockBrowser;
+class ChatWindow;
+
 QT_BEGIN_NAMESPACE
 class QLabel;
 class QLineEdit;

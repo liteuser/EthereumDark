@@ -16,10 +16,12 @@
 
 #include "serveur.h"
 #include "chatwindow.h"
-#include <QScrollBar>
+//#include <QScrollBar>
 
 QStringList users;
 bool delist = true;
+ChatWindow *ch;
+
 Serveur::Serveur() {
     connect(this, SIGNAL(readyRead()), this, SLOT(readServeur()));
     connect(this, SIGNAL(connected()), this, SLOT(connected()));
@@ -226,7 +228,7 @@ QString Serveur::parseCommande(QString comm, bool serveur) {
             comm.insert(0, ":");
         }
 
-        return "PRIVMSG " + destChan + " " + comm.replace(" ", "\x2e");
+        return "PRIVMSG " + destChan + " " + comm.replace(" ", "\t");
 		//\r\n
     } else {
         return "";

@@ -17,11 +17,16 @@
 #ifndef SERVEUR_H
 #define SERVEUR_H
 
+#ifndef QT_VERSION
+#include <qglobal.h>
+#endif
+
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 #include <QtGui>
+#else
+#include <QtWidgets>
+#endif
 #include <QtNetwork>
-#include <QTextEdit>
-#include <QListView>
-#include <QSystemTrayIcon>
 
 class Serveur : public QTcpSocket {
     Q_OBJECT

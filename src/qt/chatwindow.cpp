@@ -21,11 +21,11 @@ ChatWindow::ChatWindow(QWidget *parent)
     : QWidget(parent), ui(new Ui::ChatWindowClass)
 {
     ui->setupUi(this);
-    setFixedSize(750,600);
+    // setFixedSize(750,600);
     ui->splitter->hide();
     ui->lineEdit->setDisabled(true);
 
-    //connect(ui->buttonConnect, SIGNAL(clicked()), this, SLOT(connecte()));
+    connect(ui->buttonConnect, SIGNAL(clicked()), this, SLOT(connecte()));
 
 	connect(ui->actionQuit, SIGNAL(triggered()), this, SLOT(close()));
         //connect(ui->actionCloseTab, SIGNAL(triggered()), this, SLOT(closeTab()));
@@ -169,7 +169,7 @@ void ChatWindow::connecte()
 
     serveurs.insert("irc.freenode.net",serveur);
 
-    //serveur->pseudo=ui->editPseudo->text();
+    serveur->pseudo=ui->editPseudo->text();
     serveur->serveur="irc.freenode.net";
     serveur->port=6667;
     serveur->affichage=textEdit;
@@ -182,10 +182,7 @@ void ChatWindow::connecte()
 	connect(serveur, SIGNAL(joinTab()),this, SLOT(tabJoined() ));
 	connect(serveur, SIGNAL(tabJoined()),this, SLOT(tabJoining() ));
 
-   // serveur->connectToHost("irc.freenode.net",6667);
-
-        serveur->connectToHost("irc.freenode.net",6667);
-        //333
+    serveur->connectToHost("irc.freenode.net",6667);
 
 	ui->tab->setCurrentIndex(ui->tab->count()-1);
 
