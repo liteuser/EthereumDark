@@ -26,7 +26,7 @@ class CInv;
 class CRequestTracker;
 class CNode;
 
-static const int LAST_POW_BLOCK = 14000;
+#define LAST_POW_BLOCK (fTestNet ? 140: 14000)
 
 static const unsigned int MAX_BLOCK_SIZE = 1000000;
 static const unsigned int MAX_BLOCK_SIZE_GEN = MAX_BLOCK_SIZE/2;
@@ -56,7 +56,7 @@ static const int fHaveUPnP = false;
 #endif
 
 static const uint256 hashGenesisBlock("0x00000ad645f3f626e2c3c9f677890d42fd816f1c19462b0014692927327c6200");
-static const uint256 hashGenesisBlockTestNet("0x0");
+static const uint256 hashGenesisBlockTestNet("0x00008b3cfce0970978f5434659251fc9f45e75bd7860c77a1eab64d8ab3c62bc");
 inline int64_t PastDrift(int64_t nTime)   { return nTime - 10 * 60; } // up to 10 minutes from the past
 inline int64_t FutureDrift(int64_t nTime) { return nTime + 10 * 60; } // up to 10 minutes from the future
 
