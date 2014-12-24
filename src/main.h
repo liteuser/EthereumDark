@@ -40,7 +40,9 @@ static const int64_t MAX_MONEY = 5000000 * COIN;
 static const int64_t COIN_YEAR_REWARD = 100 * CENT; // 100% per year
 static const int64_t MAX_MINT_PROOF_OF_STAKE = 0.1 * COIN;	// 10% annual interest
 static const int64_t MAX_MINT_PROOF_OF_STAKE_FORKED = 1 * COIN;	// 100% annual interest
-static const int MODIFIER_INTERVAL_SWITCH = 7200;
+//static const int MODIFIER_INTERVAL_SWITCH = 7200;
+
+#define MODIFIER_INTERVAL_SWITCH (fTestNet ? 72: 7200)
 
 /** Hard Fork Change Times/Block */
 static const unsigned int POS_SWITCH_TIME = 1417784400; // Dec 5 13:00:00 2014 UTC
